@@ -1,0 +1,6 @@
+plots/myvenv/*
+.idea/*
+plots/*.pdf
+plots/*.csv
+cmake-build-*
+build/
