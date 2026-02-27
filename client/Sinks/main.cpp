@@ -123,7 +123,7 @@ void handleSinkCMDParams(int argc, char *argv[], xdbc::RuntimeEnv &env, std::str
 
     env.skip_serializer = vm["skip-serializer"].as<int>();
 
-    std::string schemaFile = "/xdbc-client/tests/schemas/" + env.table + ".json";
+    std::string schemaFile = "/xdbc/client/tests/schemas/" + env.table + ".json";
 
     env.schema = createSchemaFromConfig(schemaFile);
     env.schemaJSON = readJsonFileIntoString(schemaFile);

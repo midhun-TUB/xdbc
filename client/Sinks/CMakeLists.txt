@@ -35,4 +35,4 @@ add_executable(xdbcsinks main.cpp CSVSink/CSVSink.cpp PQSink/PQSink.cpp)
 set(USED_LIBS ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_PROGRAM_OPTIONS_LIBRARY} ${Boost_REGEX_LIBRARY})
 
 # Link the CSV Sink to required libraries
-target_link_libraries(xdbcsinks PRIVATE xdbc spdlog::spdlog ${USED_LIBS} -larrow ${PARQUET_SHARED_LIB})
+target_link_libraries(xdbcsinks PRIVATE xdbc-client-lib spdlog::spdlog ${USED_LIBS} -larrow ${PARQUET_SHARED_LIB})

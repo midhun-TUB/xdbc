@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
     //create schema
     std::vector<xdbc::SchemaAttribute> schema;
 
-    string schemaFile = "/xdbc-client/tests/schemas/" + env.table + ".json";
+    string schemaFile = "/xdbc/client/tests/schemas/" + env.table + ".json";
 
 
     schema = createSchemaFromConfig(schemaFile);
