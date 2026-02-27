@@ -60,9 +60,9 @@ RUN mkdir /xdbc
 COPY . /xdbc/
 
 # build xdbc
-RUN mkdir /xdbc/build && cd /xdbc/build && cmake .. -D CMAKE_BUILD_TYPE=Release && make -j8 && make install
+RUN rm -rf /xdbc/build && mkdir -p /xdbc/build && cd /xdbc/build && cmake .. -D CMAKE_BUILD_TYPE=Release && make -j8 && make install
 
-RUN mkdir /xdbc/build/client/Sinks/build && cd /xdbc/build/client/Sinks/build && cmake /xdbc/client/Sinks -D CMAKE_BUILD_TYPE=Release && make -j8
+RUN rm -rf /xdbc/build/client/Sinks/build && mkdir -p /xdbc/build/client/Sinks/build && cd /xdbc/build/client/Sinks/build && cmake /xdbc/client/Sinks -D CMAKE_BUILD_TYPE=Release && make -j8
 
 RUN ldconfig
 

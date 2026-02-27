@@ -37,4 +37,7 @@ set(USED_LIBS ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_PROGRAM_OP
 # Link the CSV Sink to required libraries
 target_link_libraries(xdbcsinks PRIVATE xdbc-client-lib spdlog::spdlog ${USED_LIBS} -larrow ${PARQUET_SHARED_LIB})
 
-add_subdirectory(tests)
+# Only build tests when GTest is available (i.e., from root project build)
+if(TARGET GTest::gtest_main)
+  add_subdirectory(tests)
+endif()
