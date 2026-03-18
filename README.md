@@ -1,17 +1,49 @@
-# XDBC
+# XDBC Monorepo :  `git filter-repo`
 
-- [XDBC](https://dl.acm.org/doi/10.1145/3725294) is a holistic, high-performance framework for fast and scalable data transfers across heterogeneous data systems (e.g. DBMS to dataframes) aiming to combine the generality of generic solutions with performance of specialized connectors
-- It decomposes data transfer into a configurable pipeline (read -> deserialize -> compress -> send/receive -> decompress -> serialize -> write) with pipeline-parallel execution and ring-buffer memory manager for low resource overhead.
-- The core of the framework (xdbc-client and xdbc-server) are written in C++ with bindings available for Python and Spark. It includes built-in adapters to connect to PostgreSQL, CSV, Parquet and Pandas.
-- The project includes a lightweight heuristic optimizer implemented in Python that automatically tunes the parallelism, buffer sizes, intermediate formats and compression algorithms to the current environment.
+This monorepo merges `xdbc-client` and `xdbc-server` (branch: `test/reproduce`) using **`git filter-repo --to-subdirectory-filter`**.
 
+## Structure
 
-## Project Structure
+```
+XDBC-filter/
+  client/   ← xdbc-client source
+  server/   ← xdbc-server source
+```
+To access the history of client (or server) use git log as given below
+```bash
+git log -- client/xdbc/xclient.cpp
+```
 
-XDBC consists of multiple repositories covering the cross-system functionality. For the reproducibility experiments the following repositories will be cloned and used :
+## Running the Project
 
-- [`xdbc-client`](https://github.com/polydbms/xdbc-client) Client-side module, for loading data into the target system.
-- [`xdbc-server`](https://github.com/polydbms/xdbc-server) Server-side module, for extracting the data from the source system.
-- [`xdbc-python`](https://github.com/polydbms/xdbc-python) Python bindings for loading data into Pandas (through pybind).
-- [`xdbc-spark`](https://github.com/polydbms/xdbc-spark) Spark bindings, for loading data into a Spark RDD (through a custom DataSource with JNI).
-- [`pg_xdbc_fdw`](https://github.com/polydbms/pg_xdbc_fdw) PostgreSQL Foreign Data Wrapper, for loading data into a table.
+To build the combined image and spin up both the **client** and **server** containers :
+
+```bash
+# 1. Build the unified image
+make
+
+# 2. Start the infrastructure
+docker compose up -d
+```
+
+This will create two containers (`xdbcserver` and `xdbcclient`) using the same `xdbc-unified:latest` image, mapping their shared `/dev/shm` volumes correctly.
+
+Before running, download and extract the required dataset to `/dev/shm`:
+
+```bash
+# Download the ss13husallm dataset (~250 MB compressed, ~1.2 GB extracted)
+wget -O ss13husallm.csv.tar.gz "https://tubcloud.tu-berlin.de/s/M3aeptL8R5ekWSD/download?path=%2F&files=ss13husallm.csv.tar.gz"
+
+# Extract to /dev/shm (shared memory, accessible inside containers)
+tar --overwrite -xzf ss13husallm.csv.tar.gz -C /dev/shm
+```
+
+You can then run commands inside them:
+
+```bash
+# Start the server
+docker exec -it xdbcserver bash -c "./xdbc-server/build/xdbc-server"
+
+# Run a client command
+docker exec -it xdbcclient bash -c "/xdbc-client/Sinks/build/xdbcsinks --server-host=xdbcserver --table ss13husallm -f1 -b 1024 -p 32000 -n1 -w1 -d1 -s1 --skip-serializer=0 --target=csv"
+```
